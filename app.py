@@ -20,13 +20,12 @@ st.markdown("""
     /* IMPORTS */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
-    /* --- ROOT VARIABLES (The Brand Palette) --- */
+    /* --- ROOT VARIABLES --- */
     :root {
-        --bg-color: #050505; /* Almost Pure Black */
+        --bg-color: #050505;
         --card-bg: #0A0A0A;
         --border-color: #262626;
-        --accent-primary: #8B5CF6; /* Violet Glow */
-        --accent-secondary: #3B82F6; /* Blue Glow */
+        --accent-primary: #8B5CF6;
         --text-primary: #EDEDED;
         --text-secondary: #A1A1AA;
     }
@@ -38,28 +37,25 @@ st.markdown("""
         color: var(--text-primary);
     }
     
-    h1, h2, h3 {
-        font-weight: 800 !important;
-        letter-spacing: -0.02em;
-    }
+    h1, h2, h3 { font-weight: 800 !important; letter-spacing: -0.02em; }
 
-    /* --- TYPOGRAPHY: GRADIENT TITLE --- */
+    /* --- TYPOGRAPHY --- */
     h1 span {
         background: linear-gradient(90deg, #FFFFFF 0%, #999999 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    /* --- COMPONENT: METRIC CARDS (The 'Linear' Glow) --- */
+    /* --- COMPONENT: METRIC CARDS (Fixed Truncation) --- */
     div[data-testid="stMetric"] {
         background-color: var(--card-bg);
         border: 1px solid var(--border-color);
-        padding: 20px;
+        padding: 15px; /* Mengurangi padding agar ruang konten lebih luas */
         border-radius: 12px;
         transition: all 0.3s ease;
+        overflow: visible; /* Memaksa konten tidak terpotong */
     }
     
-    /* Hover Effect: Glowing Border */
     div[data-testid="stMetric"]:hover {
         border-color: var(--accent-primary);
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
@@ -68,7 +64,7 @@ st.markdown("""
 
     div[data-testid="stMetricLabel"] {
         font-family: 'Inter', sans-serif;
-        font-size: 13px;
+        font-size: 12px; /* Sedikit dikecilkan */
         color: var(--text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -76,12 +72,18 @@ st.markdown("""
 
     div[data-testid="stMetricValue"] {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 28px;
+        font-size: 24px; /* Turun dari 28px agar angka miliaran muat */
         font-weight: 700;
         color: #fff;
     }
+    
+    /* Delta (Label kecil di bawah angka) */
+    div[data-testid="stMetricDelta"] {
+        font-family: 'Inter', sans-serif;
+        font-size: 11px;
+    }
 
-    /* --- COMPONENT: BUTTONS --- */
+    /* --- BUTTONS --- */
     div.stButton > button {
         background: linear-gradient(180deg, #1e1e1e 0%, #0a0a0a 100%);
         color: white;
@@ -92,55 +94,43 @@ st.markdown("""
         width: 100%;
         transition: all 0.2s;
     }
-    
-    div.stButton > button:hover {
-        border-color: var(--text-primary);
-        color: #fff;
-        box-shadow: 0 0 10px rgba(255,255,255,0.1);
-    }
-    
-    /* Primary Action Button Override */
     div.stButton > button:active {
         background: var(--accent-primary);
         border-color: var(--accent-primary);
     }
 
-    /* --- COMPONENT: INPUTS --- */
+    /* --- INPUTS --- */
     .stTextInput input {
         background-color: #0A0A0A !important;
         border: 1px solid #333 !important;
         color: white !important;
         border-radius: 8px;
     }
-    .stTextInput input:focus {
-        border-color: var(--accent-primary) !important;
-    }
+    .stTextInput input:focus { border-color: var(--accent-primary) !important; }
 
-    /* --- COMPONENT: TABS --- */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 20px;
-        border-bottom: 1px solid #262626;
-        padding-bottom: 5px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        background: transparent;
-        border: none;
-        color: var(--text-secondary);
-        font-weight: 600;
-    }
-    .stTabs [aria-selected="true"] {
-        color: var(--accent-primary) !important;
-        border-bottom: 2px solid var(--accent-primary);
-    }
+    /* --- TABS --- */
+    .stTabs [data-baseweb="tab-list"] { gap: 20px; border-bottom: 1px solid #262626; padding-bottom: 5px; }
+    .stTabs [data-baseweb="tab"] { background: transparent; border: none; color: var(--text-secondary); font-weight: 600; }
+    .stTabs [aria-selected="true"] { color: var(--accent-primary) !important; border-bottom: 2px solid var(--accent-primary); }
     
-    /* Hide Streamlit Branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
+    #MainMenu {visibility: hidden;} footer {visibility: hidden;}
     
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. HEADER & HERO ---
+# --- 3. HELPER FUNCTION (FORMATTER) ---
+def format_volume(num):
+    """Mengubah angka panjang menjadi format K/M/B agar muat di UI"""
+    if num >= 1_000_000_000:
+        return f"{num/1_000_000_000:.2f}B" # Billions
+    elif num >= 1_000_000:
+        return f"{num/1_000_000:.2f}M" # Millions
+    elif num >= 1_000:
+        return f"{num/1_000:.1f}K" # Thousands
+    else:
+        return f"{num}"
+
+# --- 4. HEADER & HERO ---
 col_h1, col_h2 = st.columns([0.1, 0.9])
 with col_h1:
     st.markdown("<h1 style='font-size: 40px;'>⚡</h1>", unsafe_allow_html=True)
@@ -150,7 +140,7 @@ with col_h2:
 
 st.markdown("---")
 
-# --- 4. SIDEBAR ---
+# --- 5. SIDEBAR ---
 with st.sidebar:
     st.markdown("### CONTROL STATION")
     ticker = st.text_input("ASSET TICKER", value="BBRI.JK").upper()
@@ -161,13 +151,12 @@ with st.sidebar:
     st.markdown("---")
     st.info("STATUS: **ONLINE**\n\nAI CORE: **LLAMA-3**\nDATA FEED: **REALTIME**")
 
-# --- 5. MAIN LOGIC ---
+# --- 6. MAIN LOGIC ---
 
 if analyze_btn:
     news_engine = NewsFetcher()
     llm_engine = LLMEngine()
     
-    # Custom Loader yang minimalis
     with st.status("SYSTEM PROCESS...", expanded=True) as status:
         st.write("Targeting Asset Data...")
         market_fetcher = MarketFetcher(ticker)
@@ -197,24 +186,27 @@ if analyze_btn:
 if 'data' in st.session_state:
     data = st.session_state['data']
     
-    # --- METRICS GRID (The Glowing Cards) ---
+    # --- METRICS GRID (Compact Version) ---
     col1, col2, col3, col4 = st.columns(4)
     
     col1.metric("ASSET PRICE", f"{data['summary']['current_price']:,}")
     
-    # Custom Logic untuk RSI Label
+    # RSI Logic: Label diperpendek agar tidak terpotong
     rsi = data['summary']['rsi']
     rsi_label = "NEUTRAL"
-    if rsi < 30: rsi_label = "OVERSOLD (BUY)"
-    elif rsi > 70: rsi_label = "OVERBOUGHT (SELL)"
+    if rsi < 30: rsi_label = "OVERSOLD" # Hapus (BUY) agar muat
+    elif rsi > 70: rsi_label = "OVERBOUGHT"
     
     col2.metric("RSI (14)", f"{rsi}", rsi_label)
     col3.metric("MOMENTUM", data['summary']['trend'])
-    col4.metric("VOL (24H)", f"{data['summary']['volume']:,}")
+    
+    # Volume Logic: Gunakan format compact (e.g. 172.6M)
+    vol_formatted = format_volume(data['summary']['volume'])
+    col4.metric("VOL (24H)", vol_formatted)
 
     st.markdown("###")
 
-    # --- CHART SECTION (The Cyberpunk Graph) ---
+    # --- CHART SECTION ---
     st.markdown(f"<h4 style='font-family: Inter; font-weight: 800;'>PRICE ACTION: {data['ticker']}</h4>", unsafe_allow_html=True)
     
     fig = go.Figure()
@@ -223,11 +215,10 @@ if 'data' in st.session_state:
         open=data['hist_df']['Open'], high=data['hist_df']['High'],
         low=data['hist_df']['Low'], close=data['hist_df']['Close'], 
         name='Price',
-        increasing_line_color='#8B5CF6', # Neon Violet
-        decreasing_line_color='#525252'  # Dark Grey (Ghost)
+        increasing_line_color='#8B5CF6', 
+        decreasing_line_color='#525252'
     ))
     
-    # Chart Styling Ekstrem
     fig.update_layout(
         height=450,
         margin=dict(l=0, r=0, t=10, b=0),
@@ -239,13 +230,12 @@ if 'data' in st.session_state:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- ANALYSIS SECTION (Clean Typography) ---
+    # --- ANALYSIS SECTION ---
     st.markdown("###")
     
     tab1, tab2 = st.tabs(["INTELLIGENCE REPORT", "DATA SOURCES"])
     
     with tab1:
-        # Container khusus untuk Teks AI
         st.markdown(f"""
         <div style="
             background-color: #0A0A0A; 
@@ -295,7 +285,6 @@ if 'data' in st.session_state:
                 st.error("Export Failed")
 
 else:
-    # Empty State - Minimalist Center
     st.markdown("""
     <div style='text-align: center; margin-top: 100px; color: #333;'>
         <h3 style='color: #222;'>WAITING FOR INPUT</h3>
