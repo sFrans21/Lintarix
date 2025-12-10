@@ -1,0 +1,4 @@
+yfinance==0.2.40          # Data Saham
+duckduckgo-search==6.1.0  # Search Engine (Gratis, ganti Google API)
+pandas==2.2.2             # Manipulasi Data Tabel
+termcolor==2.4.0          # Biar output di terminal berwarna (keren dikit)
