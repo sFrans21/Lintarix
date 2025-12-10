@@ -7,3 +7,4 @@ python-dotenv
 groq
 fpdf
 kaleido==0.2.1
+termcolor
